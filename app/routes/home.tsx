@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
-import { PokemonTable } from "~/components/pokemon-table";
+import { PokemonList } from "~/components/pokemon-list";
+import { getPokemonList } from "~/services/pokemon.service";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,7 +9,28 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const limit = 20;
+  const offset = (page - 1) * limit;
+
+  try {
+    const { pokemon, totalCount } = await getPokemonList(limit, offset);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      pokemon,
+      page,
+      totalPages,
+      totalCount,
+    };
+  } catch (error) {
+    throw new Response("Failed to load Pokemon", { status: 500 });
+  }
+}
+
+export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="space-y-6">
@@ -18,7 +40,7 @@ export default function Home() {
             Browse and explore Pokémon data
           </p>
         </div>
-        <PokemonTable />
+        <PokemonList loaderData={loaderData} />
       </div>
     </div>
   );
