@@ -84,3 +84,16 @@ Export the following:
 - List endpoint: `GET /pokemon?limit={limit}&offset={offset}`
 - Detail endpoint: `GET /pokemon/{id}`
 - PokeAPI base: `https://pokeapi.co/api/v2`
+
+## Implementation
+
+**Status**: ✅ Completed
+
+**Commit**: `9a22fb45b4bd34a1ec0a45c035cc076c5cdb0fc4`
+
+All features implemented as planned:
+- Pokemon detail types added to `pokemon.types.ts`
+- `getPokemonById` service function created
+- Dynamic route configured with `pokemon/:id`
+- Detail page component built with loader, meta, and UI
+- Navigation links already present in PokemonList component
