@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pokeapi.co)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd shadcn/ui with Pokemon table and pagination\n\nIntegrated shadcn/ui component library and created a Pokemon data table with pagination functionality:\n\n- Set up shadcn/ui with React Router (table, pagination, button components)\n- Added stub data for 25 Pokemon with types, abilities, and sprites\n- Created PokemonTable component with 10 items per page\n- Updated home route to display Pokemon table\n- Configured @/* path alias alongside existing ~/* alias\n- Added CLAUDE.md documentation for future development\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
