@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Runtime**: Node.js
 - **Language**: TypeScript
 - **Styling**: TailwindCSS v4
+- **UI Components**: shadcn/ui (Radix UI primitives)
 - **Build**: Vite
 
 ## Development Commands
@@ -24,6 +25,9 @@ npm run build
 
 # Run production server
 npm start
+
+# Add shadcn/ui components
+npx shadcn@latest add [component-name]
 ```
 
 ## Architecture
@@ -32,7 +36,39 @@ npm start
 - Routes defined in `app/routes.ts` using `@react-router/dev/routes`
 - Route components live in `app/routes/` directory
 - Each route uses typed exports from `+types/[route-name]` for type safety
-- Example: `app/routes/home.tsx` exports `meta`, `loader`, `action`, etc.
+- Dynamic routes use `$` prefix (e.g., `pokemon.$id.tsx` for `/pokemon/:id`)
+
+### Data Loading Pattern
+- Server-side data fetching via `loader` functions in route files
+- Loaders run on server before render, data available via `useLoaderData()`
+- Type-safe loaders using `Route.LoaderArgs` from route `+types`
+- For non-blocking parallel data: use `useFetcher` to load after initial render
+
+### Project Structure
+```
+app/
+├── routes/           # Route components with loaders
+├── components/       # React components (UI + feature components)
+├── services/         # API services (PokeAPI integration)
+├── types/            # TypeScript type definitions
+├── lib/              # Utility functions
+└── root.tsx          # Root layout + error boundary
+```
+
+### Services Layer
+- `app/services/pokemon.service.ts` handles all PokeAPI calls
+- Functions: `getPokemonList()`, `getPokemonById()`, `extractPokemonId()`
+- API base: `https://pokeapi.co/api/v2`
+
+### Type Safety
+- Types defined in `app/types/pokemon.types.ts`
+- Route loaders/actions typed via `+types/[route-name]` imports
+- Path aliases: `~/*` maps to `app/*`, `@/*` maps to `app/*`
+
+### UI Components
+- shadcn/ui components in `app/components/ui/`
+- Styling uses `cn()` utility (tailwind-merge + clsx)
+- Located in `app/lib/utils.ts`
 
 ### Layout & Error Handling
 - `app/root.tsx` contains:

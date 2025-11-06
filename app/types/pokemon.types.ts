@@ -69,6 +69,10 @@ export interface Pokemon {
   types: PokemonType[];
   stats: PokemonStat[];
   abilities: PokemonAbility[];
+  species: {
+    name: string;
+    url: string;
+  };
 }
 
 // PokeAPI detail response structure
@@ -81,4 +85,35 @@ export interface PokemonApiDetailResponse {
   types: PokemonType[];
   stats: PokemonStat[];
   abilities: PokemonAbility[];
+  species: {
+    name: string;
+    url: string;
+  };
+}
+
+// Evolution types
+export interface PokemonSpecies {
+  name: string;
+  evolution_chain: {
+    url: string;
+  };
+}
+
+export interface ChainLink {
+  is_baby: boolean;
+  species: {
+    name: string;
+    url: string;
+  };
+  evolves_to: ChainLink[];
+}
+
+export interface EvolutionChain {
+  id: number;
+  chain: ChainLink;
+}
+
+export interface Evolution {
+  name: string;
+  id: number;
 }

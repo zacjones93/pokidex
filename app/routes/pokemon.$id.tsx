@@ -1,6 +1,7 @@
 import type { Route } from "./+types/pokemon.$id";
 import { Link } from "react-router";
 import { getPokemonById } from "~/services/pokemon.service";
+import { PokemonEvolutions } from "~/components/pokemon-evolutions";
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data) {
@@ -165,6 +166,11 @@ export default function PokemonDetail({ loaderData }: Route.ComponentProps) {
               );
             })}
           </div>
+        </div>
+
+        {/* Evolutions Section */}
+        <div className="border-t border-gray-200 dark:border-gray-700 p-8">
+          <PokemonEvolutions pokemonId={pokemon.id} currentPokemonName={pokemon.name} />
         </div>
       </div>
     </div>
