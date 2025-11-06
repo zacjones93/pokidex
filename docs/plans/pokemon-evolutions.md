@@ -206,6 +206,46 @@ Add evolutions section after Stats:
 
 ## Implementation Status
 
-**Status**: ⏳ Pending Review
+**Status**: ✅ Completed
 
-Next: Review plan → Implement → Test with various Pokemon
+**Commit**: `7dd6bae`
+
+### Steps Completed
+
+1. ✅ **Add Evolution Types** - Added to `pokemon.types.ts`
+   - `PokemonSpecies`, `EvolutionChain`, `ChainLink`, `Evolution`
+   - Updated `Pokemon` and `PokemonApiDetailResponse` to include `species`
+
+2. ✅ **Add Evolution Service Functions** - Added to `pokemon.service.ts`
+   - `getPokemonSpecies()` - Fetch species data
+   - `getEvolutionChain()` - Fetch evolution chain
+   - `parseEvolutionChain()` - Recursively flatten chain
+   - `getEvolutions()` - Combined helper function
+   - Updated `getPokemonById()` to include species field
+
+3. ✅ **Create PokemonEvolutions Component** - `app/components/pokemon-evolutions.tsx`
+   - Uses `useFetcher` for non-blocking data loading
+   - Loading skeleton while fetching
+   - Highlights current Pokemon
+   - Filters out current Pokemon if alone in chain
+   - Links to evolution detail pages
+
+4. ✅ **Create Evolution API Route** - `app/routes/api.evolutions.$id.tsx`
+   - Added to `app/routes.ts` as `/api/evolutions/:id`
+   - Returns evolution array
+   - Error handling returns empty array
+
+5. ✅ **Update Detail Page** - `app/routes/pokemon.$id.tsx`
+   - Added evolutions section after stats
+   - Passes `pokemonId` and `currentPokemonName` to component
+
+### Design Decisions Made
+
+1. **Current Pokemon Display**: Show and highlight with blue badge + "(Current)" label
+2. **Multi-branch Evolutions**: Display all in horizontal flex wrap (works for Eevee's 8 evolutions)
+3. **Pre-evolutions**: Show all stages including baby/pre-evolved forms
+4. **Loading Skeleton**: Three placeholder boxes matching button dimensions
+
+### Testing Notes
+
+Feature loads evolutions in parallel after main Pokemon data, as intended. Pending UI pattern working correctly with `useFetcher`.
