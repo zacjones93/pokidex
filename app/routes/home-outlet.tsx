@@ -2,11 +2,14 @@ import type { Route } from "./+types/home-outlet";
 import {
 	Link,
 	useNavigation,
+	useNavigate,
+	useLocation,
 	Outlet,
 	useViewTransitionState,
 } from "react-router";
 import { useState } from "react";
 import { getPokemonList } from "~/services/pokemon.service";
+import { Button } from "~/components/ui/button";
 import {
 	Pagination,
 	PaginationContent,
@@ -53,20 +56,41 @@ export function headers() {
 export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 	const { pokemon, page, totalPages, totalCount } = loaderData;
 	const navigation = useNavigation();
+	const navigate = useNavigate();
+	const location = useLocation();
 	const [clickedPage, setClickedPage] = useState<number | null>(null);
 
 	const isNavigating = navigation.state === "loading";
+	const isPokemonActive = location.pathname !== "/home-outlet" && location.pathname !== "/home-outlet/";
+
+	const handleRandomPokemon = () => {
+		// Use max ID of 1010 (Gen 9) to avoid gaps in Pokemon IDs
+		const MAX_POKEMON_ID = 1010;
+		const limit = 12; // Must match loader limit
+		const randomId = Math.floor(Math.random() * MAX_POKEMON_ID) + 1;
+		const targetPage = Math.ceil(randomId / limit);
+		navigate(`/home-outlet/${randomId}?page=${targetPage}`);
+	};
 
 	return (
 		<div className="container mx-auto py-10 px-4">
 			<div className="space-y-6">
 				{/* Top: Pokemon List */}
 				<div className="space-y-6">
-					<div>
-						<h1 className="text-4xl font-bold tracking-tight">Pokédex</h1>
-						<p className="text-gray-600 dark:text-gray-400 mt-2">
-							Browse and explore Pokémon data
-						</p>
+					<div className="flex justify-between items-start">
+						<div>
+							<h1 className="text-4xl font-bold tracking-tight">Pokédex</h1>
+							<p className="text-gray-600 dark:text-gray-400 mt-2">
+								Browse and explore Pokémon data
+							</p>
+						</div>
+						<Button
+							onClick={handleRandomPokemon}
+							variant="outline"
+							className="gap-2"
+						>
+							Get random Pokémon ✨
+						</Button>
 					</div>
 
 					{/* Pokemon Grid */}

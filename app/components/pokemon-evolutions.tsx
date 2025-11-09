@@ -13,8 +13,10 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }
   const fetcher = useFetcher<Evolution[]>();
 
   useEffect(() => {
-    // Load evolutions after component mounts
-    if (fetcher.state === "idle" && !fetcher.data) {
+    // Skip fetch if pokemonId is already in current evolution data
+    const alreadyHaveThisChain = fetcher.data?.some(evo => evo.id === pokemonId);
+
+    if (fetcher.state === "idle" && !alreadyHaveThisChain) {
       fetcher.load(`/api/evolutions/${pokemonId}`);
     }
   }, [pokemonId, fetcher]);
