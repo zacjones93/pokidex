@@ -1,18 +1,12 @@
 // IndexedDB service for Pokemon notes
+import type { PokemonNote } from "~/types/notes.types";
+
 const DB_NAME = "pokidex-notes";
 const DB_VERSION = 1;
 const STORE_NAME = "notes";
 
 // Simulate network delay for learning purposes
 const SIMULATED_DELAY_MS = 800;
-
-export interface PokemonNote {
-  id: string;
-  pokemonId: number;
-  content: string;
-  timestamp: number;
-  createdAt: string;
-}
 
 let dbInstance: IDBDatabase | null = null;
 
