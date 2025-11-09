@@ -22,6 +22,12 @@ function simulateDelay(): Promise<void> {
  */
 export function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
+    // IndexedDB only available in browser
+    if (typeof window === "undefined" || typeof indexedDB === "undefined") {
+      reject(new Error("IndexedDB not available (server-side)"));
+      return;
+    }
+
     if (dbInstance) {
       resolve(dbInstance);
       return;

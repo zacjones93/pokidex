@@ -12,26 +12,14 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
 /**
- * Loader: For learning - fetch notes data
+ * Client Loader: Fetch notes data from IndexedDB (browser-only)
  * Async operations demonstrate loader behavior with simulated delays
  */
-export async function loader({ params }: Route.LoaderArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 	const pokemonId = parseInt(params.id!, 10);
 
-	// Await the notes to see loading behavior
-	// Note: IndexedDB only works in browser, so this will fail server-side
-	// In that case, return empty array
-	let notes: PokemonNote[] = [];
-	try {
-		notes = await getNotesByPokemonId(pokemonId);
-		// Ensure notes is always an array
-		if (!Array.isArray(notes)) {
-			notes = [];
-		}
-	} catch (error) {
-		console.error("Error loading notes:", error);
-		notes = [];
-	}
+	// Await notes to demonstrate async behavior with 800ms delay
+	const notes = await getNotesByPokemonId(pokemonId);
 
 	return {
 		notes,
@@ -40,10 +28,10 @@ export async function loader({ params }: Route.LoaderArgs) {
 }
 
 /**
- * Action: Handles form submissions for add/delete operations
- * Form component automatically calls this when submitted
+ * Client Action: Handles form submissions for add/delete operations
+ * Runs in browser only (IndexedDB requires browser environment)
  */
-export async function action({ request, params }: Route.ActionArgs) {
+export async function clientAction({ request, params }: Route.ClientActionArgs) {
 	const pokemonId = parseInt(params.id!, 10);
 	const formData = await request.formData();
 
@@ -73,9 +61,6 @@ export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
 	const { notes, pokemonId } = loaderData;
 	const navigation = useNavigation();
 	const formRef = useRef<HTMLFormElement>(null);
-
-	// Ensure notes is always an array
-	const safeNotes = Array.isArray(notes) ? notes : [];
 
 	// Check if form is being submitted
 	const isAdding =
@@ -109,25 +94,10 @@ export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
 
 			{/* Notes List */}
 			<NotesList
-				notes={safeNotes}
+				notes={notes}
 				isDeleting={isDeleting}
 				deletingNoteId={navigation.formData?.get("noteId") as string}
 			/>
-		</div>
-	);
-}
-
-/**
- * Loading skeleton shown while notes are loading
- */
-function NotesLoadingSkeleton() {
-	return (
-		<div className="space-y-4">
-			<div className="animate-pulse">
-				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
-				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
-				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-			</div>
 		</div>
 	);
 }
@@ -144,7 +114,7 @@ function NotesList({
 	isDeleting: boolean;
 	deletingNoteId: string | null;
 }) {
-	if (!Array.isArray(notes) || notes.length === 0) {
+	if (notes.length === 0) {
 		return (
 			<div className="text-center py-8 text-gray-500 dark:text-gray-400">
 				<p>No notes yet. Add your first note above!</p>
