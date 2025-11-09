@@ -30,6 +30,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
+export function headers() {
+  return {
+    "Cache-Control": "public, max-age=300, s-maxage=3600",
+  };
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="container mx-auto py-10 px-4">

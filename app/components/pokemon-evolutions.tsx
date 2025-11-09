@@ -1,13 +1,15 @@
 import { useEffect } from "react";
 import { Link, useFetcher } from "react-router";
 import type { Evolution } from "~/types/pokemon.types";
+import { getTypeColor } from "~/lib/type-colors";
 
 interface PokemonEvolutionsProps {
   pokemonId: number;
   currentPokemonName: string;
+  primaryType: string;
 }
 
-export function PokemonEvolutions({ pokemonId, currentPokemonName }: PokemonEvolutionsProps) {
+export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }: PokemonEvolutionsProps) {
   const fetcher = useFetcher<Evolution[]>();
 
   useEffect(() => {
@@ -54,13 +56,15 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName }: PokemonEvol
           return (
             <Link
               key={evo.id}
-              to={`/pokemon/${evo.id}`}
+              to={`/home-outlet/${evo.id}`}
+              preventScrollReset
               className={`
-                px-4 py-3 rounded-lg font-medium text-sm transition-all
+                px-4 py-3 rounded-lg font-medium text-sm text-white transition-all shadow-md
+                ${getTypeColor(primaryType)}
                 ${
                   isCurrent
-                    ? "bg-blue-500 text-white ring-2 ring-blue-300 dark:ring-blue-700"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    ? "ring-2 ring-offset-2 ring-yellow-400"
+                    : "hover:scale-105 hover:shadow-lg"
                 }
               `}
             >

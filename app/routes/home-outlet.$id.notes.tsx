@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Form, useNavigation, redirect } from "react-router";
+import { Form, useNavigation, redirect, useRouteLoaderData } from "react-router";
 import type { Route } from "./+types/home-outlet.$id.notes";
 import {
 	getNotesByPokemonId,
@@ -10,6 +10,8 @@ import type { PokemonNote } from "~/types/notes.types";
 import { formatNoteDate } from "~/lib/notes-utils";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
+import { PokemonEvolutions } from "~/components/pokemon-evolutions";
+import type { Pokemon } from "~/types/pokemon.types";
 
 /**
  * Client Loader: Fetch notes data from IndexedDB (browser-only)
@@ -31,7 +33,10 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
  * Client Action: Handles form submissions for add/delete operations
  * Runs in browser only (IndexedDB requires browser environment)
  */
-export async function clientAction({ request, params }: Route.ClientActionArgs) {
+export async function clientAction({
+	request,
+	params,
+}: Route.ClientActionArgs) {
 	const pokemonId = parseInt(params.id!, 10);
 	const formData = await request.formData();
 
@@ -59,6 +64,7 @@ export async function clientAction({ request, params }: Route.ClientActionArgs) 
  */
 export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
 	const { notes, pokemonId } = loaderData;
+	const pokemon = useRouteLoaderData<Pokemon>("routes/home-outlet.$id");
 	const navigation = useNavigation();
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -71,33 +77,48 @@ export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
 		navigation.state === "submitting" &&
 		navigation.formData?.get("intent") === "delete";
 
+	const primaryType = pokemon?.types[0].type.name;
+
 	return (
-		<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-			<h2 className="text-2xl font-bold mb-4">Notes</h2>
+		<div className="space-y-4">
+			<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+				<h2 className="text-2xl font-bold mb-4">Notes</h2>
 
-			{/* Add Note Form */}
-			<Form method="post" className="mb-6" ref={formRef}>
-				<input type="hidden" name="intent" value="add" />
+				{/* Add Note Form */}
+				<Form method="post" className="mb-6" ref={formRef}>
+					<input type="hidden" name="intent" value="add" />
 
-				<Textarea
-					name="content"
-					placeholder="Add a note about this Pokémon..."
-					className="mb-3"
-					rows={4}
-					disabled={isAdding}
+					<Textarea
+						name="content"
+						placeholder="Add a note about this Pokémon..."
+						className="mb-3"
+						rows={4}
+						disabled={isAdding}
+					/>
+
+					<Button type="submit" disabled={isAdding} className="w-full">
+						{isAdding ? "Adding Note..." : "Add Note"}
+					</Button>
+				</Form>
+
+				{/* Notes List */}
+				<NotesList
+					notes={notes}
+					isDeleting={isDeleting}
+					deletingNoteId={navigation.formData?.get("noteId") as string}
 				/>
+			</div>
 
-				<Button type="submit" disabled={isAdding} className="w-full">
-					{isAdding ? "Adding Note..." : "Add Note"}
-				</Button>
-			</Form>
-
-			{/* Notes List */}
-			<NotesList
-				notes={notes}
-				isDeleting={isDeleting}
-				deletingNoteId={navigation.formData?.get("noteId") as string}
-			/>
+			{/* Pokemon Evolutions */}
+			{pokemon && (
+				<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+					<PokemonEvolutions
+						pokemonId={pokemon.id}
+						currentPokemonName={pokemon.name}
+						primaryType={primaryType!}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }

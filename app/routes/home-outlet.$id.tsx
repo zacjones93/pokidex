@@ -1,7 +1,6 @@
 import type { Route } from "./+types/home-outlet.$id";
 import { Outlet, useNavigation } from "react-router";
 import { getPokemonById } from "~/services/pokemon.service";
-import { PokemonEvolutions } from "~/components/pokemon-evolutions";
 import { PokemonCard } from "~/components/pokemon-card";
 
 export function meta({ data }: Route.MetaArgs) {
@@ -50,15 +49,6 @@ export default function PokemonDetailOutlet({ loaderData }: Route.ComponentProps
     <div className="grid lg:grid-cols-2 gap-6">
       {/* Left: Pokemon detail */}
       <div className="space-y-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <PokemonEvolutions
-            key={pokemon.id}
-            pokemonId={pokemon.id}
-            currentPokemonName={pokemon.name}
-            primaryType={primaryType}
-          />
-        </div>
-
         <PokemonCard pokemon={pokemon} variant="full" showSkeleton={isTransitioning} />
       </div>
 
