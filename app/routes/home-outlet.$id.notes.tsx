@@ -1,6 +1,5 @@
 import { Suspense, useRef } from "react";
-import { Await, Form, useNavigation } from "react-router";
-import { defer, redirect } from "react-router";
+import { Await, Form, useNavigation, redirect } from "react-router";
 import type { Route } from "./+types/home-outlet.$id.notes";
 import {
   getNotesByPokemonId,
@@ -13,17 +12,18 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
 /**
- * Loader: Returns deferred promise for notes data
+ * Loader: Returns promise for deferred data loading
+ * In React Router v7, return raw objects with promises (defer is deprecated)
  * This allows the page to render immediately while notes load in background
  */
-export async function loader({ params }: Route.LoaderArgs) {
+export function loader({ params }: Route.LoaderArgs) {
   const pokemonId = parseInt(params.id!, 10);
 
-  // Defer returns immediately, notes promise resolves later
-  return defer({
-    notes: getNotesByPokemonId(pokemonId), // Returns promise
+  // Return raw object with promise - React Router handles deferral
+  return {
+    notes: getNotesByPokemonId(pokemonId), // Returns promise directly
     pokemonId,
-  });
+  };
 }
 
 /**
