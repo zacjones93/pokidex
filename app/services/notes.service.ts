@@ -3,6 +3,9 @@ const DB_NAME = "pokidex-notes";
 const DB_VERSION = 1;
 const STORE_NAME = "notes";
 
+// Simulate network delay for learning purposes
+const SIMULATED_DELAY_MS = 800;
+
 export interface PokemonNote {
   id: string;
   pokemonId: number;
@@ -12,6 +15,13 @@ export interface PokemonNote {
 }
 
 let dbInstance: IDBDatabase | null = null;
+
+/**
+ * Simulate network delay for educational purposes
+ */
+function simulateDelay(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS));
+}
 
 /**
  * Initialize IndexedDB database
@@ -54,6 +64,9 @@ export function initDB(): Promise<IDBDatabase> {
 export async function getNotesByPokemonId(
   pokemonId: number
 ): Promise<PokemonNote[]> {
+  // Simulate async network request
+  await simulateDelay();
+
   try {
     const db = await initDB();
 
@@ -87,6 +100,9 @@ export async function addNote(
   pokemonId: number,
   content: string
 ): Promise<PokemonNote> {
+  // Simulate async network request
+  await simulateDelay();
+
   try {
     const db = await initDB();
 
@@ -121,6 +137,9 @@ export async function addNote(
  * Delete a note by ID
  */
 export async function deleteNote(id: string): Promise<void> {
+  // Simulate async network request
+  await simulateDelay();
+
   try {
     const db = await initDB();
 
