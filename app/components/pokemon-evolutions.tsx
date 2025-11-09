@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useFetcher } from "react-router";
+import { Link, useFetcher, useSearchParams } from "react-router";
 import type { Evolution } from "~/types/pokemon.types";
 import { getTypeColor } from "~/lib/type-colors";
 
@@ -11,6 +11,8 @@ interface PokemonEvolutionsProps {
 
 export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }: PokemonEvolutionsProps) {
   const fetcher = useFetcher<Evolution[]>();
+  const [searchParams] = useSearchParams();
+  const pageParam = searchParams.get("page");
 
   useEffect(() => {
     // Skip fetch if pokemonId is already in current evolution data
@@ -24,7 +26,7 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }
   // Show loading skeleton while fetching
   if (fetcher.state === "loading" || !fetcher.data) {
     return (
-      <div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Evolutions</h2>
         <div className="flex flex-wrap gap-3">
           {[1, 2, 3].map((i) => (
@@ -49,7 +51,7 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }
   }
 
   return (
-    <div>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-xl font-semibold mb-4">Evolution Chain</h2>
       <div className="flex flex-wrap gap-3">
         {fetcher.data.map((evo) => {
@@ -58,7 +60,7 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }
           return (
             <Link
               key={evo.id}
-              to={`/home-outlet/${evo.id}`}
+              to={`/home-outlet/${evo.id}${pageParam ? `?page=${pageParam}` : ""}`}
               preventScrollReset
               className={`
                 px-4 py-3 rounded-lg font-medium text-sm text-white transition-all shadow-md

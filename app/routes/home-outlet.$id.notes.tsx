@@ -111,13 +111,11 @@ export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
 
 			{/* Pokemon Evolutions */}
 			{pokemon && (
-				<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-					<PokemonEvolutions
-						pokemonId={pokemon.id}
-						currentPokemonName={pokemon.name}
-						primaryType={primaryType!}
-					/>
-				</div>
+				<PokemonEvolutions
+					pokemonId={pokemon.id}
+					currentPokemonName={pokemon.name}
+					primaryType={primaryType!}
+				/>
 			)}
 		</div>
 	);

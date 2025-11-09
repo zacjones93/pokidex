@@ -4,12 +4,16 @@ import {
 	useNavigation,
 	useNavigate,
 	useLocation,
+	useMatches,
+	useSearchParams,
 	Outlet,
 	useViewTransitionState,
 } from "react-router";
 import { useState } from "react";
 import { getPokemonList } from "~/services/pokemon.service";
 import { Button } from "~/components/ui/button";
+import { getTypeColor, getTypeBackgroundGradient } from "~/lib/type-colors";
+import type { Pokemon } from "~/types/pokemon.types";
 import {
 	Pagination,
 	PaginationContent,
@@ -58,10 +62,16 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 	const navigation = useNavigation();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const matches = useMatches();
 	const [clickedPage, setClickedPage] = useState<number | null>(null);
 
 	const isNavigating = navigation.state === "loading";
 	const isPokemonActive = location.pathname !== "/home-outlet" && location.pathname !== "/home-outlet/";
+
+	// Get current Pokemon data from child route
+	const pokemonDetailMatch = matches.find(m => m.id === "routes/home-outlet.$id");
+	const currentPokemon = pokemonDetailMatch?.data as Pokemon | undefined;
+	const primaryType = currentPokemon?.types[0].type.name;
 
 	const handleRandomPokemon = () => {
 		// Use max ID of 1010 (Gen 9) to avoid gaps in Pokemon IDs
@@ -86,7 +96,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 						</div>
 						<Button
 							onClick={handleRandomPokemon}
-							variant="outline"
+							variant={isPokemonActive ? "default" : "outline"}
 							className="gap-2"
 						>
 							Get random Pokémon ✨
@@ -96,7 +106,15 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 					{/* Pokemon Grid */}
 					<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
 						{pokemon.map((p) => {
-							return <PokemonGridItem key={p.id} pokemon={p} />;
+							return (
+								<PokemonGridItem
+									key={p.id}
+									pokemon={p}
+									isActive={currentPokemon?.id === p.id}
+									activeTypeColor={primaryType ? getTypeBackgroundGradient(primaryType) : undefined}
+									currentPage={page}
+								/>
+							);
 						})}
 					</div>
 
@@ -185,28 +203,42 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 
 function PokemonGridItem({
 	pokemon,
+	isActive,
+	activeTypeColor,
+	currentPage,
 }: {
 	pokemon: { id: number; name: string };
+	isActive?: boolean;
+	activeTypeColor?: string;
+	currentPage?: number;
 }) {
-	const pokemonUrl = `/home-outlet/${pokemon.id}`;
+	const pokemonUrl = `/home-outlet/${pokemon.id}${currentPage ? `?page=${currentPage}` : ""}`;
 	const isTransitioning = useViewTransitionState(pokemonUrl);
 
 	return (
 		<Link to={pokemonUrl} className="group" viewTransition>
 			<div
-				className={`border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all relative ${
-					isTransitioning
+				className={`border rounded-lg p-4 transition-all relative ${
+					isActive && activeTypeColor
+						? `${activeTypeColor} text-white ring-2 ring-offset-2 ring-white scale-105 border-transparent`
+						: isTransitioning
 						? "ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105"
-						: ""
+						: "hover:bg-gray-50 dark:hover:bg-gray-800"
 				}`}
 			>
-				{isTransitioning && (
+				{isTransitioning && !isActive && (
 					<div className="absolute inset-0 bg-blue-500/10 rounded-lg animate-pulse" />
 				)}
-				<div className="text-sm text-gray-500 dark:text-gray-400 font-mono relative z-10">
+				<div className={`text-sm font-mono relative z-10 ${
+					isActive ? "text-black/80" : "text-gray-500 dark:text-gray-400"
+				}`}>
 					#{pokemon.id.toString().padStart(3, "0")}
 				</div>
-				<p className="font-semibold capitalize mt-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 relative z-10">
+				<p className={`font-semibold capitalize mt-2 relative z-10 ${
+					isActive
+						? "text-black"
+						: "group-hover:text-blue-600 dark:group-hover:text-blue-400"
+				}`}>
 					{pokemon.name}
 				</p>
 			</div>
