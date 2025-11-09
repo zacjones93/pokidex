@@ -47,8 +47,8 @@ export default function PokemonDetailOutlet({ loaderData }: Route.ComponentProps
   const primaryType = pokemon.types[0].type.name;
 
   return (
-    <>
-      {/* Middle column: Pokemon detail */}
+    <div className="grid lg:grid-cols-2 gap-6">
+      {/* Left: Pokemon detail */}
       <div className="space-y-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <PokemonEvolutions
@@ -62,11 +62,11 @@ export default function PokemonDetailOutlet({ loaderData }: Route.ComponentProps
         <PokemonCard pokemon={pokemon} variant="full" showSkeleton={isTransitioning} />
       </div>
 
-      {/* Right column: Notes outlet */}
+      {/* Right: Notes outlet */}
       <div className="space-y-4">
         <Outlet />
       </div>
-    </>
+    </div>
   );
 }
 

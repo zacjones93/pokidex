@@ -1,10 +1,10 @@
-import { Suspense, useRef } from "react";
-import { Await, Form, useNavigation, redirect } from "react-router";
+import { useRef } from "react";
+import { Form, useNavigation, redirect } from "react-router";
 import type { Route } from "./+types/home-outlet.$id.notes";
 import {
-  getNotesByPokemonId,
-  addNote,
-  deleteNote,
+	getNotesByPokemonId,
+	addNote,
+	deleteNote,
 } from "~/services/notes.service";
 import type { PokemonNote } from "~/types/notes.types";
 import { formatNoteDate } from "~/lib/notes-utils";
@@ -12,18 +12,31 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
 /**
- * Loader: Returns promise for deferred data loading
- * In React Router v7, return raw objects with promises (defer is deprecated)
- * This allows the page to render immediately while notes load in background
+ * Loader: For learning - fetch notes data
+ * Async operations demonstrate loader behavior with simulated delays
  */
-export function loader({ params }: Route.LoaderArgs) {
-  const pokemonId = parseInt(params.id!, 10);
+export async function loader({ params }: Route.LoaderArgs) {
+	const pokemonId = parseInt(params.id!, 10);
 
-  // Return raw object with promise - React Router handles deferral
-  return {
-    notes: getNotesByPokemonId(pokemonId), // Returns promise directly
-    pokemonId,
-  };
+	// Await the notes to see loading behavior
+	// Note: IndexedDB only works in browser, so this will fail server-side
+	// In that case, return empty array
+	let notes: PokemonNote[] = [];
+	try {
+		notes = await getNotesByPokemonId(pokemonId);
+		// Ensure notes is always an array
+		if (!Array.isArray(notes)) {
+			notes = [];
+		}
+	} catch (error) {
+		console.error("Error loading notes:", error);
+		notes = [];
+	}
+
+	return {
+		notes,
+		pokemonId,
+	};
 }
 
 /**
@@ -31,156 +44,153 @@ export function loader({ params }: Route.LoaderArgs) {
  * Form component automatically calls this when submitted
  */
 export async function action({ request, params }: Route.ActionArgs) {
-  const pokemonId = parseInt(params.id!, 10);
-  const formData = await request.formData();
+	const pokemonId = parseInt(params.id!, 10);
+	const formData = await request.formData();
 
-  const intent = formData.get("intent");
+	const intent = formData.get("intent");
 
-  if (intent === "add") {
-    const content = formData.get("content") as string;
+	if (intent === "add") {
+		const content = formData.get("content") as string;
 
-    if (!content || content.trim() === "") {
-      return { error: "Note content cannot be empty" };
-    }
+		if (!content || content.trim() === "") {
+			return { error: "Note content cannot be empty" };
+		}
 
-    await addNote(pokemonId, content.trim());
-  } else if (intent === "delete") {
-    const noteId = formData.get("noteId") as string;
-    await deleteNote(noteId);
-  }
+		await addNote(pokemonId, content.trim());
+	} else if (intent === "delete") {
+		const noteId = formData.get("noteId") as string;
+		await deleteNote(noteId);
+	}
 
-  // Redirect back to same route to trigger revalidation
-  return redirect(`/home-outlet/${pokemonId}`);
+	// Redirect back to same route to trigger revalidation
+	return redirect(`/home-outlet/${pokemonId}`);
 }
 
 /**
  * Notes component with deferred loading and Form actions
  */
 export default function PokemonNotes({ loaderData }: Route.ComponentProps) {
-  const { notes, pokemonId } = loaderData;
-  const navigation = useNavigation();
-  const formRef = useRef<HTMLFormElement>(null);
+	const { notes, pokemonId } = loaderData;
+	const navigation = useNavigation();
+	const formRef = useRef<HTMLFormElement>(null);
 
-  // Check if form is being submitted
-  const isAdding =
-    navigation.state === "submitting" &&
-    navigation.formData?.get("intent") === "add";
+	// Ensure notes is always an array
+	const safeNotes = Array.isArray(notes) ? notes : [];
 
-  const isDeleting =
-    navigation.state === "submitting" &&
-    navigation.formData?.get("intent") === "delete";
+	// Check if form is being submitted
+	const isAdding =
+		navigation.state === "submitting" &&
+		navigation.formData?.get("intent") === "add";
 
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Notes</h2>
+	const isDeleting =
+		navigation.state === "submitting" &&
+		navigation.formData?.get("intent") === "delete";
 
-      {/* Add Note Form */}
-      <Form method="post" className="mb-6" ref={formRef}>
-        <input type="hidden" name="intent" value="add" />
+	return (
+		<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+			<h2 className="text-2xl font-bold mb-4">Notes</h2>
 
-        <Textarea
-          name="content"
-          placeholder="Add a note about this Pokémon..."
-          className="mb-3"
-          rows={4}
-          disabled={isAdding}
-        />
+			{/* Add Note Form */}
+			<Form method="post" className="mb-6" ref={formRef}>
+				<input type="hidden" name="intent" value="add" />
 
-        <Button type="submit" disabled={isAdding} className="w-full">
-          {isAdding ? "Adding Note..." : "Add Note"}
-        </Button>
-      </Form>
+				<Textarea
+					name="content"
+					placeholder="Add a note about this Pokémon..."
+					className="mb-3"
+					rows={4}
+					disabled={isAdding}
+				/>
 
-      {/* Notes List with Suspense */}
-      <Suspense fallback={<NotesLoadingSkeleton />}>
-        <Await resolve={notes}>
-          {(resolvedNotes: PokemonNote[]) => (
-            <NotesList
-              notes={resolvedNotes}
-              isDeleting={isDeleting}
-              deletingNoteId={navigation.formData?.get("noteId") as string}
-            />
-          )}
-        </Await>
-      </Suspense>
-    </div>
-  );
+				<Button type="submit" disabled={isAdding} className="w-full">
+					{isAdding ? "Adding Note..." : "Add Note"}
+				</Button>
+			</Form>
+
+			{/* Notes List */}
+			<NotesList
+				notes={safeNotes}
+				isDeleting={isDeleting}
+				deletingNoteId={navigation.formData?.get("noteId") as string}
+			/>
+		</div>
+	);
 }
 
 /**
  * Loading skeleton shown while notes are loading
  */
 function NotesLoadingSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="animate-pulse">
-        <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
-        <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
-        <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="space-y-4">
+			<div className="animate-pulse">
+				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+				<div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+			</div>
+		</div>
+	);
 }
 
 /**
  * Notes list component
  */
 function NotesList({
-  notes,
-  isDeleting,
-  deletingNoteId,
+	notes,
+	isDeleting,
+	deletingNoteId,
 }: {
-  notes: PokemonNote[];
-  isDeleting: boolean;
-  deletingNoteId: string | null;
+	notes: PokemonNote[];
+	isDeleting: boolean;
+	deletingNoteId: string | null;
 }) {
-  if (notes.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        <p>No notes yet. Add your first note above!</p>
-      </div>
-    );
-  }
+	if (!Array.isArray(notes) || notes.length === 0) {
+		return (
+			<div className="text-center py-8 text-gray-500 dark:text-gray-400">
+				<p>No notes yet. Add your first note above!</p>
+			</div>
+		);
+	}
 
-  return (
-    <div className="space-y-4">
-      {notes.map((note) => {
-        const isDeletingThis = isDeleting && deletingNoteId === note.id;
+	return (
+		<div className="space-y-4">
+			{notes.map((note) => {
+				const isDeletingThis = isDeleting && deletingNoteId === note.id;
 
-        return (
-          <div
-            key={note.id}
-            className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ${
-              isDeletingThis ? "opacity-50" : ""
-            }`}
-          >
-            <p className="text-gray-800 dark:text-gray-200 mb-2 whitespace-pre-wrap">
-              {note.content}
-            </p>
+				return (
+					<div
+						key={note.id}
+						className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 ${
+							isDeletingThis ? "opacity-50" : ""
+						}`}
+					>
+						<p className="text-gray-800 dark:text-gray-200 mb-2 whitespace-pre-wrap">
+							{note.content}
+						</p>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {formatNoteDate(note.timestamp)}
-              </span>
+						<div className="flex items-center justify-between">
+							<span className="text-sm text-gray-500 dark:text-gray-400">
+								{formatNoteDate(note.timestamp)}
+							</span>
 
-              <Form method="post">
-                <input type="hidden" name="intent" value="delete" />
-                <input type="hidden" name="noteId" value={note.id} />
+							<Form method="post">
+								<input type="hidden" name="intent" value="delete" />
+								<input type="hidden" name="noteId" value={note.id} />
 
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  size="sm"
-                  disabled={isDeletingThis}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                >
-                  {isDeletingThis ? "Deleting..." : "Delete"}
-                </Button>
-              </Form>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+								<Button
+									type="submit"
+									variant="ghost"
+									size="sm"
+									disabled={isDeletingThis}
+									className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+								>
+									{isDeletingThis ? "Deleting..." : "Delete"}
+								</Button>
+							</Form>
+						</div>
+					</div>
+				);
+			})}
+		</div>
+	);
 }
