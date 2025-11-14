@@ -58,26 +58,35 @@ Format: Use clear headings, cite file:line numbers, provide concrete examples.
 ## Executive Summary
 [Brief overview of critical issues across all perspectives]
 
-## Critical Issues (All Reviewers)
-[Issues flagged by multiple reviewers - highest priority]
+## Critical Issues
+- **[Issue description]** - *Routing, TypeScript*
+  - [Details with file:line references]
+  - [Rationale from each reviewer]
 
-## React Router Team Findings
-### Critical
-### Major
-### Minor
-### Praise
+## Major Issues
+- **[Issue description]** - *TypeScript*
+  - [Details with file:line references]
+  - [Rationale]
 
-## React Core Team Findings
-### Critical
-### Major
-### Minor
-### Praise
+## Minor Issues
+- **[Issue description]** - *React*
+  - [Details with file:line references]
+  - [Rationale]
 
-## Anders Hejlsberg Findings
-### Critical
-### Major
-### Minor
-### Praise
+## What's Done Well
+- **[Praise item]** - *Routing, TypeScript*
+  - [What they liked and why]
+
+## Detailed Reviewer Findings
+
+### React Router Team
+[Full review findings organized by severity]
+
+### React Core Team
+[Full review findings organized by severity]
+
+### Anders Hejlsberg
+[Full review findings organized by severity]
 
 ## Synthesis & Recommendations
 [Unified action items prioritized by impact]
