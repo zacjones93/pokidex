@@ -56,7 +56,7 @@ export async function clientAction({
 	}
 
 	// Redirect back to same route to trigger revalidation
-	return redirect(`/home-outlet/${pokemonId}`);
+	return redirect(`/${pokemonId}`);
 }
 
 /**

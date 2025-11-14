@@ -60,7 +60,7 @@ export function PokemonEvolutions({ pokemonId, currentPokemonName, primaryType }
           return (
             <Link
               key={evo.id}
-              to={`/home-outlet/${evo.id}${pageParam ? `?page=${pageParam}` : ""}`}
+              to={`/${evo.id}${pageParam ? `?page=${pageParam}` : ""}`}
               preventScrollReset
               className={`
                 px-4 py-3 rounded-lg font-medium text-sm text-white transition-all shadow-md

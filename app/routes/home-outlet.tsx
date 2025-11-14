@@ -66,7 +66,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 	const [clickedPage, setClickedPage] = useState<number | null>(null);
 
 	const isNavigating = navigation.state === "loading";
-	const isPokemonActive = location.pathname !== "/home-outlet" && location.pathname !== "/home-outlet/";
+	const isPokemonActive = location.pathname !== "/" && location.pathname !== "/";
 
 	// Get current Pokemon data from child route
 	const pokemonDetailMatch = matches.find(m => m.id === "routes/home-outlet.$id");
@@ -79,7 +79,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 		const limit = 12; // Must match loader limit
 		const randomId = Math.floor(Math.random() * MAX_POKEMON_ID) + 1;
 		const targetPage = Math.ceil(randomId / limit);
-		navigate(`/home-outlet/${randomId}?page=${targetPage}`);
+		navigate(`/${randomId}?page=${targetPage}`);
 	};
 
 	return (
@@ -123,7 +123,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 						<PaginationContent>
 							<PaginationItem>
 								<PaginationPrevious
-									href={page > 1 ? `/home-outlet?page=${page - 1}` : undefined}
+									href={page > 1 ? `/?page=${page - 1}` : undefined}
 									className={
 										page === 1
 											? "pointer-events-none opacity-50"
@@ -152,7 +152,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 								return (
 									<PaginationItem key={pageNum}>
 										<PaginationLink
-											href={`/home-outlet?page=${pageNum}`}
+											href={`/?page=${pageNum}`}
 											isActive={page === pageNum}
 											className="cursor-pointer"
 											onClick={() => setClickedPage(pageNum)}
@@ -170,7 +170,7 @@ export default function HomeOutlet({ loaderData }: Route.ComponentProps) {
 								<PaginationNext
 									href={
 										page < totalPages
-											? `/home-outlet?page=${page + 1}`
+											? `/?page=${page + 1}`
 											: undefined
 									}
 									className={
@@ -212,7 +212,7 @@ function PokemonGridItem({
 	activeTypeColor?: string;
 	currentPage?: number;
 }) {
-	const pokemonUrl = `/home-outlet/${pokemon.id}${currentPage ? `?page=${currentPage}` : ""}`;
+	const pokemonUrl = `/${pokemon.id}${currentPage ? `?page=${currentPage}` : ""}`;
 	const isTransitioning = useViewTransitionState(pokemonUrl);
 
 	return (
