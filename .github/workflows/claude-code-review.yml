@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude Code Review
+      - name: Run Multi-Perspective Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
@@ -40,18 +40,23 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Please review this pull request and provide feedback on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
+            Activate the review-coordinator skill to conduct a comprehensive multi-perspective code review.
 
-            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+            This will spawn 3 parallel review agents:
+            1. React Router Team (progressive enhancement, nested routing, loaders/actions)
+            2. React Core Team (declarative UI, functional design, state predictability)
+            3. Anders Hejlsberg (type safety, developer productivity, tooling)
 
-            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+            Review this pull request by:
+            1. Using `gh pr diff` to get the PR changes
+            2. Using `gh pr view` to get PR context
+            3. Spawning 3 review agents in parallel using the Task tool
+            4. Synthesizing their findings into a unified report
+            5. Using `gh pr comment` to post the review
+
+            Use the repository's CLAUDE.md for additional guidance on style and conventions.
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          claude_args: '--allowed-tools "Task,Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Read,Grep,Glob"'
 
