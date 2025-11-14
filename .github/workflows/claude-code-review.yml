@@ -42,15 +42,16 @@ jobs:
 
             Activate the review-coordinator skill to conduct a comprehensive multi-perspective code review.
 
-            This will spawn 3 parallel review agents:
-            1. React Router Team (progressive enhancement, nested routing, loaders/actions)
-            2. React Core Team (declarative UI, functional design, state predictability)
-            3. Anders Hejlsberg (type safety, developer productivity, tooling)
+            This will spawn 4 parallel review agents:
+            1. Accessibility Team (Marcy Sutton & Léonie Watson - inclusive design, semantic HTML, keyboard/screen reader accessibility)
+            2. React Router Team (progressive enhancement, nested routing, loaders/actions)
+            3. React Core Team (declarative UI, functional design, state predictability)
+            4. Anders Hejlsberg (type safety, developer productivity, tooling)
 
             Review this pull request by:
             1. Using `gh pr diff` to get the PR changes
             2. Using `gh pr view` to get PR context
-            3. Spawning 3 review agents in parallel using the Task tool
+            3. Spawning 4 review agents in parallel using the Task tool
             4. Synthesizing their findings into a unified report
             5. Using `gh pr comment` to post the review
 
