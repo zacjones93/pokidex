@@ -46,14 +46,14 @@ export default function PokemonDetailOutlet({ loaderData }: Route.ComponentProps
   const primaryType = pokemon.types[0].type.name;
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid lg:grid-cols-2 gap-8 mt-8">
       {/* Left: Pokemon detail */}
-      <div className="space-y-4">
+      <div>
         <PokemonCard pokemon={pokemon} variant="full" showSkeleton={isTransitioning} />
       </div>
 
       {/* Right: Notes outlet */}
-      <div className="space-y-4">
+      <div>
         <Outlet />
       </div>
     </div>
