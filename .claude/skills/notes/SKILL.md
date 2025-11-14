@@ -1,7 +1,7 @@
 ---
 name: notes
-description: Maintain and organize daily notes for the current project. Create, update, and manage these notes in a structured manner upon user request. Use this skill when the user requests "please make a note...".
-allowed-tools: Bash, Glob, Read, Write, Edit
+description: DO NOT USE THE APPLICATION NOTE SERVICE. Maintain and organize daily notes for the current project. Create, update, and manage these notes in a structured manner upon user request. Use this skill when the user requests "please make|create|write|add a note...".
+allowed-tools: Bash, Glob, Read
 ---
 
 # Notes Skill

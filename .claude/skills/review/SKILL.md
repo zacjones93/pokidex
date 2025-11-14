@@ -1,6 +1,6 @@
 ---
 name: review
-description: Centralizes persona-driven code reviews (Fowler, Torvalds, Carmack, React core, etc.) so Claude can pick or combine expert viewpoints when the user asks for a code review or perspective-specific critique.
+description: Centralizes persona-driven code reviews (Carmack, React core, Anders, React Router, etc.) so Claude can pick or combine expert viewpoints when the user asks for a code review or perspective-specific critique.
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
@@ -21,7 +21,7 @@ Unifies every reviewer persona into one Skill. Claude activates this Skill whene
    - Low-level performance → Read `references/carmack-reviewer.md` FIRST
    - Observability/tracing → Read `references/perf-reviewer.md` FIRST
    - React patterns → Read `references/react-reviewer.md` FIRST
-   - React Router/Remix → Read `references/react-router-reviewer.md` FIRST
+   - React Router → Read `references/react-router-reviewer.md` FIRST
 3. **Apply the reviewer persona's perspective** by following their specific guidance and priorities from the loaded reference.
 4. Cite specific files/lines, flag issues, and provide concrete recommendations.
 
