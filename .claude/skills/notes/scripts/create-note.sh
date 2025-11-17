@@ -1,67 +1,98 @@
 #!/bin/bash
-# Usage: ./create-note.sh "Note title" "file/path.tsx:123" "Description"
+# Universal note creation script with template support
+# Usage: ./create-note.sh [--template TYPE] "Title" "file:line" "Body"
 
 set -e
+
+# Parse template flag
+TEMPLATE="default"
+if [[ "$1" == "--template" ]]; then
+    TEMPLATE="$2"
+    shift 2
+fi
 
 # Get timestamp and date
 TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
 DATE=$(date +%Y-%m-%d)
 TIME=$(echo $TIMESTAMP | cut -d'-' -f4-6 | sed 's/-/:/g')
 
-# Args
-TITLE="$1"
-FILE_REF="$2"
-CURRENT_APPROACH="$3"
-SUGGESTED_UPDATE="$4"
-CONTEXT="$5"
-CODE_SNIPPET="$6"
+# Template-specific configuration
+case "$TEMPLATE" in
+    "review")
+        NOTE_DIR="docs/notes/reviews"
+        NOTE_FILE="${NOTE_DIR}/${DATE}.md"
+        FILE_HEADER="## Code Reviews - ${DATE}\n\nDaily code review findings and recommendations.\n"
+        SEPARATOR="---\n\n"
+        # Args for review template
+        COMPONENT_NAME="$1"
+        FILE_PATH="$2"
+        REVIEW_BODY="$3"
 
-# Validate args
-if [ -z "$TITLE" ] || [ -z "$FILE_REF" ]; then
-    echo "Usage: $0 \"Note title\" \"file/path:line\" \"Current approach\" \"Suggested update\" \"Context\" \"Code snippet (optional)\""
-    exit 1
-fi
+        if [ -z "$COMPONENT_NAME" ] || [ -z "$FILE_PATH" ] || [ -z "$REVIEW_BODY" ]; then
+            echo "Usage: $0 --template review \"Component/File Name\" \"path/to/file.tsx\" \"Review findings markdown\""
+            exit 1
+        fi
+        ;;
 
-# Create notes dir if needed
-mkdir -p docs/notes
+    "default")
+        NOTE_DIR="docs/notes"
+        NOTE_FILE="${NOTE_DIR}/${DATE}.md"
+        FILE_HEADER="## [${DATE}]"
+        SEPARATOR=""
+        # Args for default template
+        TITLE="$1"
+        FILE_REF="$2"
+        BODY="$3"
 
-NOTE_FILE="docs/notes/${DATE}.md"
+        if [ -z "$TITLE" ] || [ -z "$FILE_REF" ]; then
+            echo "Usage: $0 [--template default] \"Note title\" \"file/path:line\" \"Body\""
+            exit 1
+        fi
+        ;;
 
-# Check if file exists for append vs create
+    *)
+        echo "Unknown template: $TEMPLATE"
+        echo "Available templates: default, review"
+        exit 1
+        ;;
+esac
+
+# Create notes directory
+mkdir -p "$NOTE_DIR"
+
+# Initialize file if needed
 if [ -f "$NOTE_FILE" ]; then
     echo "Appending to existing note file..."
 else
-    echo "## [${DATE}]" > "$NOTE_FILE"
+    echo -e "$FILE_HEADER" > "$NOTE_FILE"
     echo "Created new note file: $NOTE_FILE"
 fi
 
-# Append note entry
-cat >> "$NOTE_FILE" << EOF
+# Append based on template
+case "$TEMPLATE" in
+    "review")
+        cat >> "$NOTE_FILE" << EOF
+
+${SEPARATOR}### [${TIME}] - Code Review: ${COMPONENT_NAME}
+
+**File**: ${FILE_PATH}
+
+${REVIEW_BODY}
+
+EOF
+        ;;
+
+    "default")
+        cat >> "$NOTE_FILE" << EOF
 
 ### [${TIME}] - ${TITLE}
 
 - **File**: ${FILE_REF}
-- **Current approach/pattern**: ${CURRENT_APPROACH}
-- **Suggested update**: ${SUGGESTED_UPDATE}
-- **Context**: ${CONTEXT}
-EOF
-
-# Add code snippet if provided
-if [ -n "$CODE_SNIPPET" ]; then
-    cat >> "$NOTE_FILE" << EOF
-- **Code reference**:
-  \`\`\`typescript
-  ${CODE_SNIPPET}
-  \`\`\`
-EOF
-fi
-
-cat >> "$NOTE_FILE" << EOF
-- **Next steps**:
-  - [ ] Review and evaluate
-  - [ ] Implement changes if approved
+${BODY}
 
 EOF
+        ;;
+esac
 
 echo "✓ Note added to $NOTE_FILE"
 echo "View: cat $NOTE_FILE"

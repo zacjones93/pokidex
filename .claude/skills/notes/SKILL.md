@@ -10,17 +10,39 @@ Centralizes project development notes so Claude captures important insights, dec
 
 ## Critical Workflow
 
-**REQUIRED**: Use the `create-note.sh` script for ALL note creation:
+**REQUIRED**: Before creating notes, determine the note type and load the appropriate template reference:
+
+- **Code Review Notes** → Read `references/review-note-template.md` FIRST, then use `scripts/create-note.sh --template review`
+- **Development Notes** → Use `scripts/create-note.sh` (default template)
+
+### Code Review Notes
+
+**MANDATORY: Load the template reference before creating review notes:**
 
 ```bash
+# 1. Read the template reference (REQUIRED)
+Read: .claude/skills/notes/references/review-note-template.md
+
+# 2. Use the unified script with --template flag
+./.claude/skills/notes/scripts/create-note.sh --template review "Component/File Name" "path/to/file.tsx" "Review findings markdown"
+```
+
+### Development Notes
+
+```bash
+# Default template (no flag needed)
 ./.claude/skills/notes/scripts/create-note.sh "Title" "file:line" "Body"
+
+# Or explicitly
+./.claude/skills/notes/scripts/create-note.sh --template default "Title" "file:line" "Body"
 ```
 
 **Guidelines**:
-1. **Always use the script**—it handles timestamps, file creation, and formatting
-2. **Body format**: Use markdown with code blocks, evaluation points, next steps
-3. **Keep it concise**: Focus on actionable insights
-4. **IMPORTANT**: When user mentions "push to github" or creating issues, use `Skill("github")` tool (NOT bash `gh` commands)
+1. **Always load template references** before creating notes of that type
+2. **Use the --template flag** for non-default note types (e.g., `--template review`)
+3. **Body format**: Use markdown with code blocks, evaluation points, next steps
+4. **Keep it concise**: Focus on actionable insights
+5. **IMPORTANT**: When user mentions "push to github" or creating issues, use `Skill("github")` tool (NOT bash `gh` commands)
 
 ## Note Structure
 
@@ -58,24 +80,40 @@ Use this format for all notes unless prompted otherwise:
 
 ## Helper Script
 
-For quick note creation from the command line, use the included script:
+The unified `create-note.sh` script supports multiple templates via `--template` flag:
 
 ```bash
-# Usage
+# Development notes (default)
 ./.claude/skills/notes/scripts/create-note.sh \
   "Note title" \
   "file/path.tsx:123" \
   "Description of the note"
 
-# Example
+# Code review notes
 ./.claude/skills/notes/scripts/create-note.sh \
-  "Extract Pokemon type logic" \
-  "app/components/pokemon-card.tsx:45" \
-  "Type colors hardcoded, should use getTypeColor utility"
+  --template review \
+  "home-outlet" \
+  "app/routes/home-outlet.tsx" \
+  "**Reviewers**: Accessibility, React Router
+
+#### Critical Issues
+1. **Loading spinners lack announcements** (lines 135-136)
+   - Problem: No screen reader feedback
+   - Fix: Add role=\"status\" and aria-label"
 ```
 
 The script automatically:
 - Generates timestamp in correct format
 - Creates or appends to today's note file
 - Maintains consistent note structure
-- Creates `docs/notes/` directory if needed
+- Routes to appropriate directory based on template (`docs/notes/` or `docs/notes/reviews/`)
+- Supports extensible template system (add new templates in script's case statement)
+
+## Template References (load on demand)
+
+**CRITICAL**: Always load the appropriate template reference BEFORE creating notes of that type. These references define the structure, format, and guidelines for each note category.
+
+- **Code Review Notes** - Multi-perspective review findings organized by severity with actionable fixes. [Open template](references/review-note-template.md)
+- **Development Notes** - Standard development insights, decisions, and learnings. (Default format in SKILL.md)
+
+Each template stays out of context until explicitly opened, keeping Claude's context lean while providing fast access to detailed formatting guidance.

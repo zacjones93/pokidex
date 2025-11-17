@@ -32,6 +32,12 @@ Orchestrates comprehensive code reviews by spawning 4 specialized review agents 
    - Note perspective-specific insights
    - Prioritize actionable recommendations
 
+5. **Create daily note** - After synthesizing the review, use the notes skill to save findings:
+   - **REQUIRED**: Read the template reference at `.claude/skills/notes/references/review-note-template.md`
+   - Use `Skill("notes")` to activate the notes skill
+   - Follow the review note template structure from the reference
+   - Store in `docs/notes/reviews/[YYYY-MM-DD].md`
+
 ## Agent Prompts Template
 
 Each spawned agent receives:
@@ -101,6 +107,17 @@ Format: Use clear headings, cite file:line numbers, provide concrete examples.
 - **Concrete examples**: Agents should cite specific file:line references
 - **Actionable output**: Synthesize into clear next steps, not just criticism
 - **Balance**: Celebrate good patterns alongside flagging issues
+- **Document findings**: After completing review, prompt user about creating a daily note using the notes skill
+
+## Post-Review Workflow
+
+After presenting the synthesized review to the user, offer to save the findings as a daily note:
+
+```
+Would you like me to save this review to your daily notes? I can create a structured note in docs/notes/reviews/[YYYY-MM-DD].md using the review note template.
+```
+
+If user agrees, use `Skill("notes")` and follow the review note template from `.claude/skills/notes/references/review-note-template.md`.
 
 ## When NOT to Use This Skill
 
