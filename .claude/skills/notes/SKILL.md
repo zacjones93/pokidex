@@ -85,21 +85,26 @@ The unified `create-note.sh` script supports multiple templates via `--template`
 ```bash
 # Development notes (default)
 ./.claude/skills/notes/scripts/create-note.sh \
-  "Note title" \
-  "file/path.tsx:123" \
-  "Description of the note"
+  "Add error boundary to Pokemon detail" \
+  "app/routes/pokemon.\$id.tsx:45" \
+  "- **Current approach**: No error handling for failed Pokemon API calls
+- **Suggested update**: Wrap component in ErrorBoundary component
+- **Context**: Route can crash if API returns 404
+- **Next steps**:
+  - Create error boundary component
+  - Add fallback UI for failed loads"
 
 # Code review notes
 ./.claude/skills/notes/scripts/create-note.sh \
   --template review \
   "home-outlet" \
   "app/routes/home-outlet.tsx" \
-  "**Reviewers**: Accessibility, React Router
-
-#### Critical Issues
+  "#### Critical Issues
 1. **Loading spinners lack announcements** (lines 135-136)
    - Problem: No screen reader feedback
-   - Fix: Add role=\"status\" and aria-label"
+   - Fix: Add role=\"status\" and aria-label
+
+**Reviewers**: Accessibility, React Router"
 ```
 
 The script automatically:

@@ -42,7 +42,7 @@ export function PokemonCard({ pokemon, variant = "full", showSkeleton = false }:
           <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3 mb-2 border border-yellow-300/50">
             {showSkeleton ? (
               <div className="relative w-full aspect-square">
-                <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/90 to-white/40 rounded-lg animate-shimmer bg-[length:200%_100%]" />
+                <div className="absolute inset-0 bg-linear-to-r from-white/40 via-white/90 to-white/40 rounded-lg animate-shimmer bg-size-[200%_100%]" />
               </div>
             ) : sprite ? (
               <div className="relative w-full aspect-square">
